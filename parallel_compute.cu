@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "vector.h"
 #include "config.h"
 #include <cuda_runtime.h>
@@ -6,6 +7,9 @@
 __global__ void make_accel_matrix(vector3** accels, vector3* values) {
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 	accels[idx] = &values[idx*NUMENTITIES];
+	#if __CUDA_ARCH__ >= 200
+	printf("thread %d: %d\n", idx, accels[idx])
+	#endif
 }
 
 //compute: Updates the positions and locations of the objects in the system based on gravity.
