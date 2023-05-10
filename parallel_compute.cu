@@ -8,7 +8,7 @@ __global__ void make_accel_matrix(vector3** accels, vector3* values) {
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 	accels[idx] = &values[idx*NUMENTITIES];
 	#if __CUDA_ARCH__ >= 200
-	printf("thread %d: %d\n", idx, accels[idx])
+	printf("thread %d: %d\n", idx, accels[idx]);
 	#endif
 }
 
