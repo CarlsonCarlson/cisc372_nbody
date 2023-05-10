@@ -1,7 +1,12 @@
-#include <stdlib.h>
-#include <math.h>
 #include "vector.h"
 #include "config.h"
+#include <cuda_runtime.h>
+// #include <device_launch_parameters.h>
+
+__global__ void make_accel_matrix(vector3** accels, vector3* values) {
+	int idx = blockIdx.x * blockDim.x + threadIdx.x;
+	accels[idx] = &values[idx*NUMENTITIES];
+}
 
 //compute: Updates the positions and locations of the objects in the system based on gravity.
 //Parameters: None
@@ -12,8 +17,19 @@ void compute(){
 	int i,j,k;
 	vector3* values=(vector3*)malloc(sizeof(vector3)*NUMENTITIES*NUMENTITIES);
 	vector3** accels=(vector3**)malloc(sizeof(vector3*)*NUMENTITIES);
-	for (i=0;i<NUMENTITIES;i++)
-		accels[i]=&values[i*NUMENTITIES];
+
+    // initialize the execution config
+    int nProcesses = NUMENTITIES;
+    int threadsPerBlock = 1;
+    int blocksPerGrid = (nProcesses + threadsPerBlock - 1) / threadsPerBlock;
+
+    // launch kernel (I guess each type of parallelism will have its own kernel)
+    // run_kernel<<<gridDimensions, blockDimensions>>>(kernel_args);
+    make_accel_matrix<<<blocksPerGrid, threadsPerBlock>>>(accels, values);
+
+    // wait for kernel to finish
+    cudaDeviceSynchronize();
+
 	//first compute the pairwise accelerations.  Effect is on the first argument.
 	for (i=0;i<NUMENTITIES;i++){
 		for (j=0;j<NUMENTITIES;j++){
@@ -32,20 +48,22 @@ void compute(){
 			}
 		}
 	}
+    print("accel matrix: \n");
+    print(accels)
 	//sum up the rows of our matrix to get effect on each entity, then update velocity and position.
-	for (i=0;i<NUMENTITIES;i++){
-		vector3 accel_sum={0,0,0};
-		for (j=0;j<NUMENTITIES;j++){
-			for (k=0;k<3;k++)
-				accel_sum[k]+=accels[i][j][k];
-		}
-		//compute the new velocity based on the acceleration and time interval
-		//compute the new position based on the velocity and time interval
-		for (k=0;k<3;k++){
-			hVel[i][k]+=accel_sum[k]*INTERVAL;
-			hPos[i][k]=hVel[i][k]*INTERVAL;
-		}
-	}
+	// for (i=0;i<NUMENTITIES;i++){
+	// 	vector3 accel_sum={0,0,0};
+	// 	for (j=0;j<NUMENTITIES;j++){
+	// 		for (k=0;k<3;k++)
+	// 			accel_sum[k]+=accels[i][j][k];
+	// 	}
+	// 	//compute the new velocity based on the acceleration and time interval
+	// 	//compute the new position based on the velocity and time interval
+	// 	for (k=0;k<3;k++){
+	// 		hVel[i][k]+=accel_sum[k]*INTERVAL;
+	// 		hPos[i][k]=hVel[i][k]*INTERVAL;
+	// 	}
+	// }
 	free(accels);
 	free(values);
 }
