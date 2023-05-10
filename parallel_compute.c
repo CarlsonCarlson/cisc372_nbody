@@ -48,8 +48,8 @@ void compute(){
 			}
 		}
 	}
-    print("accel matrix: \n");
-    print(accels);
+    printf("accel matrix: \n");
+    printf(accels);
 	//sum up the rows of our matrix to get effect on each entity, then update velocity and position.
 	// for (i=0;i<NUMENTITIES;i++){
 	// 	vector3 accel_sum={0,0,0};
