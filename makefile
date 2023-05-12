@@ -13,4 +13,5 @@ clean:
 parallel_compute.o: parallel_compute.cu config.h vector.h $(ALWAYS_REBUILD)
 	nvcc -c parallel_compute.cu -o parallel_compute.o
 parallel_nbody: nbody.o parallel_compute.o
-	gcc $(FLAGS) $^ -o $@ $(LIBS)
+	# gcc $(FLAGS) $^ -o $@ $(LIBS)
+	nvcc -c nbody.o parallel_compute.o -o parallel_nbody
