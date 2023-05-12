@@ -35,23 +35,23 @@ void compute(){
     cudaDeviceSynchronize();
 
 	//first compute the pairwise accelerations.  Effect is on the first argument.
-	for (i=0;i<NUMENTITIES;i++){
-		for (j=0;j<NUMENTITIES;j++){
-			// same entity, no acceleration
-			if (i==j) {
-				FILL_VECTOR(accels[i][j],0,0,0);
-			}
-			else{
-				// compute distance using distance formula, then acceleration due to gravity
-				vector3 distance;
-				for (k=0;k<3;k++) distance[k]=hPos[i][k]-hPos[j][k];
-				double magnitude_sq=distance[0]*distance[0]+distance[1]*distance[1]+distance[2]*distance[2];
-				double magnitude=sqrt(magnitude_sq);
-				double accelmag=-1*GRAV_CONSTANT*mass[j]/magnitude_sq;
-				FILL_VECTOR(accels[i][j],accelmag*distance[0]/magnitude,accelmag*distance[1]/magnitude,accelmag*distance[2]/magnitude);
-			}
-		}
-	}
+	// for (i=0;i<NUMENTITIES;i++){
+	// 	for (j=0;j<NUMENTITIES;j++){
+	// 		// same entity, no acceleration
+	// 		if (i==j) {
+	// 			FILL_VECTOR(accels[i][j],0,0,0);
+	// 		}
+	// 		else{
+	// 			// compute distance using distance formula, then acceleration due to gravity
+	// 			vector3 distance;
+	// 			for (k=0;k<3;k++) distance[k]=hPos[i][k]-hPos[j][k];
+	// 			double magnitude_sq=distance[0]*distance[0]+distance[1]*distance[1]+distance[2]*distance[2];
+	// 			double magnitude=sqrt(magnitude_sq);
+	// 			double accelmag=-1*GRAV_CONSTANT*mass[j]/magnitude_sq;
+	// 			FILL_VECTOR(accels[i][j],accelmag*distance[0]/magnitude,accelmag*distance[1]/magnitude,accelmag*distance[2]/magnitude);
+	// 		}
+	// 	}
+	// }
     printf("accel matrix: \n");
 	// print the acceleration matrix
 	for (i=0;i<NUMENTITIES;i++){
